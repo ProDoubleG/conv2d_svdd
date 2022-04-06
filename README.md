@@ -20,3 +20,5 @@
 
 ![test1](https://user-images.githubusercontent.com/78391621/161880316-a269ec6e-d124-4282-9c7e-bed978fd4435.png)
 ## However, it had low accuracy on 1 and 9 which are quite similar with letter 7
+
+## Conclusuon : raw Conv2d application on svdd does not guarantee convincing result. It needs different approch
