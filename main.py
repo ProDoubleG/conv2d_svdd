@@ -3,12 +3,13 @@
 from tensorflow.keras import layers, Model
 import tensorflow
 import numpy
-import os
+import config
 # %%
 # set variables
-final_dimension = 28 # final depth of mappped dimension
-normal_number = 7 # a number between 0~9, one of the mnist-label which we will consider as 'normal'   
-violation_constant = 0.2 # coefficient to multiply with standard deviation to define range of 'normal'
+final_dimension = config.GlobalConfig().FINAL_DIMENSION #28 # final depth of mappped dimension
+normal_number = config.GlobalConfig().NORMAL_NUMBER # a number between 0~9, one of the mnist-label which we will consider as 'normal'   
+violation_constant = config.GlobalConfig().VALIDATION_RATIO # coefficient to multiply with standard deviation to define range of 'normal'
+data_process_needed = config.GlobalConfig().DATA_PROCESS_NEEDED
 # %%
 # load mnist datasets
 train_data,test_data = tensorflow.keras.datasets.mnist.load_data()
@@ -70,15 +71,6 @@ test_label_list = list([
     ])
 # %%
 # organize mnist train datasets and test datasets by label
-data_process_needed = False
-print("checking if data exists ...")
-for label in range(10):
-    if os.path.isfile(f'./data/mnist/mnist_train_label_{label}.npy')&os.path.isfile(f'./data/mnist/mnist_test_label_{label}.npy'):
-        pass
-    else:
-        data_process_needed = True
-        break
-
 if data_process_needed:
     print("processing train data ...")
     for idx,label in enumerate(train_y):
@@ -209,7 +201,7 @@ for label in range(10):
 import matplotlib.pyplot as plt
 if final_dimension ==2:
     for label in range(10):
-        test = test_label_list[label]
+        test = svdd_filter.predict(test_label_list[label])
         fig = plt.figure(figsize = (8, 8))
         ax = fig.add_subplot(1, 1, 1)
         ax.set_title(f"normal_label : {normal_number}, test_label : {label}",fontsize=20)
@@ -231,7 +223,6 @@ else:
     print('cannot plot in 2D : final_dimension != 2, plotting by 2D pca')
     from sklearn.decomposition import PCA
     for label in range(10):
-        test = test_label_list[label]
         test = svdd_filter.predict(test_label_list[label])
         pca = PCA(n_components=2)
         normal_pca = pca.fit_transform(normal)
